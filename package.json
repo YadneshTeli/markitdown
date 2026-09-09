@@ -1,0 +1,20 @@
+{
+  "name": "markitdown-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/markitdown-ts",
+    "packages/markitdown-mcp-ts",
+    "packages/markitdown-sample-plugin-ts"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspace=packages/markitdown-ts",
+    "typecheck": "npm run typecheck --workspaces"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.0",
+    "typescript": "^7.0.2"
+  }
+}
