@@ -1,0 +1,39 @@
+{
+  "name": "markitdown-mcp",
+  "version": "0.1.0",
+  "description": "An MCP server for the markitdown TypeScript library",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "markitdown-mcp": "./dist/server.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "markitdown",
+    "mcp",
+    "model-context-protocol",
+    "markdown",
+    "converter"
+  ],
+  "author": "Yadnesh Teli",
+  "license": "MIT",
+  "dependencies": {
+    "markitdown": "file:../markitdown-ts",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "markitdown-sample-plugin",
+  "version": "0.1.0",
+  "description": "A sample plugin for the markitdown TypeScript library — RTF converter",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "markitdown",
+    "markitdown-plugin",
+    "rtf",
+    "converter"
+  ],
+  "author": "Yadnesh Teli",
+  "license": "MIT",
+  "dependencies": {
+    "markitdown": "file:../markitdown-ts"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  },
+  "markitdown-plugin": {
+    "interfaceVersion": 1
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
