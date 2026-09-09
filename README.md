@@ -2,6 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/markitdown.svg)](https://pypi.org/project/markitdown/)
 ![PyPI - Downloads](https://img.shields.io/pypi/dd/markitdown)
+[![npm](https://img.shields.io/npm/v/markitdown.svg)](https://www.npmjs.com/package/markitdown)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
 > [!IMPORTANT]
 > MarkItDown performs I/O with the privileges of the current process. Like open() or requests.get(), it will access resources that the process itself can access. Sanitize your inputs in untrusted environments, and call the narrowest `convert_*` function needed for your use case (e.g., `convert_stream()`, or `convert_local()`). See the [Security Considerations](#security-considerations) section of the documentation for more information.
@@ -298,6 +300,147 @@ print(result.markdown)
 ```sh
 docker build -t markitdown:latest .
 docker run --rm -i markitdown:latest < ~/your-file.pdf > output.md
+```
+
+## JavaScript & TypeScript (Node.js)
+
+MarkItDown is also available natively for the **JavaScript and TypeScript** ecosystem as an npm monorepo with 100% feature parity!
+
+### 📦 Packages
+
+| Package | Directory | Description |
+|---|---|---|
+| `markitdown` | [`packages/markitdown-ts`](packages/markitdown-ts) | Core TypeScript engine and CLI (`markitdown`) |
+| `markitdown-ocr` | [`packages/markitdown-ocr-ts`](packages/markitdown-ocr-ts) | OCR plugin supporting offline Tesseract.js (Wasm) and LLM Vision |
+| `markitdown-mcp` | [`packages/markitdown-mcp-ts`](packages/markitdown-mcp-ts) | Model Context Protocol (MCP) server |
+| `markitdown-sample-plugin` | [`packages/markitdown-sample-plugin-ts`](packages/markitdown-sample-plugin-ts) | Reference plugin implementation (RTF converter) |
+
+### Installation
+
+```bash
+npm install markitdown
+```
+
+To include OCR capabilities (offline Tesseract.js or LLM Vision):
+
+```bash
+npm install markitdown-ocr
+```
+
+### TypeScript / JavaScript Usage
+
+```typescript
+import { MarkItDown } from "markitdown";
+
+const md = new MarkItDown({
+  enablePlugins: true, // Automatically discovers installed plugins (e.g. markitdown-ocr)
+});
+
+// 1. Convert a local file (DOCX, PDF, XLSX, PPTX, MSG, HTML, CSV, etc.)
+const result = await md.convert("quarterly-report.docx");
+console.log(result.markdown);
+
+// 2. Convert from a remote URL (web pages, Wikipedia, YouTube, RSS)
+const wiki = await md.convert("https://en.wikipedia.org/wiki/TypeScript");
+console.log(wiki.markdown);
+
+// 3. Convert from an in-memory Buffer with format hints
+const bufferResult = await md.convert(fileBuffer, {
+  streamInfo: {
+    extension: ".pdf",
+    mimetype: "application/pdf",
+  },
+});
+console.log(bufferResult.markdown);
+```
+
+#### Image Descriptions via LLM
+
+```typescript
+import { MarkItDown } from "markitdown";
+import OpenAI from "openai";
+
+const client = new OpenAI();
+const md = new MarkItDown({
+  llmClient: client,
+  llmModel: "gpt-4o",
+  llmPrompt: "Describe this image with focus on charts, diagrams, and text.",
+});
+
+const result = await md.convert("architecture-diagram.png");
+console.log(result.markdown);
+```
+
+#### OCR with Tesseract.js (Local & Offline) or LLM Vision
+
+The TypeScript `markitdown-ocr` package provides zero-cloud offline OCR via Tesseract.js (WebAssembly) as well as cloud LLM Vision OCR:
+
+```typescript
+import { MarkItDown } from "markitdown";
+import { registerConverters } from "markitdown-ocr";
+
+const md = new MarkItDown();
+// Register OCR converters with priority -1.0 to supersede standard image & PDF handlers
+registerConverters(md);
+
+const receipt = await md.convert("scanned_receipt.jpg");
+console.log(receipt.markdown);
+```
+
+### Command-Line Interface (CLI)
+
+```bash
+# Convert a file to standard output
+npx markitdown presentation.pptx
+
+# Save converted output to a file
+npx markitdown -o output.md document.pdf
+
+# Enable 3rd-party plugins (e.g., RTF or OCR)
+npx markitdown -p scanned_document.pdf
+
+# List all installed MarkItDown plugins
+npx markitdown --list-plugins
+
+# Pipe from stdin with an extension hint
+cat data.csv | npx markitdown -x .csv
+```
+
+### MCP Server (Claude Desktop, Cursor, Antigravity)
+
+Run the Model Context Protocol (MCP) server over STDIO:
+
+```bash
+node packages/markitdown-mcp-ts/dist/server.js
+```
+
+Or configure it in your `mcpServers` configuration:
+
+```json
+{
+  "mcpServers": {
+    "markitdown": {
+      "command": "node",
+      "args": ["<path-to-markitdown>/packages/markitdown-mcp-ts/dist/server.js"]
+    }
+  }
+}
+```
+
+### Building & Testing the TypeScript Monorepo
+
+```bash
+# Install all dependencies across workspaces
+npm install
+
+# Type-check all packages
+npm run typecheck
+
+# Build ESM, CommonJS, and TypeScript .d.ts declaration bundles
+npm run build
+
+# Run complete Vitest suite (24 automated tests)
+npm test
 ```
 
 ## Contributing
