@@ -1,0 +1,43 @@
+{
+  "name": "markitdown-ocr",
+  "version": "0.1.0",
+  "description": "OCR plugin for MarkItDown TypeScript — Extracts text from images and documents using Tesseract.js and LLM Vision",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "markitdown",
+    "markitdown-plugin",
+    "ocr",
+    "tesseract",
+    "vision",
+    "llm",
+    "image-to-text"
+  ],
+  "author": "Yadnesh Teli",
+  "license": "MIT",
+  "dependencies": {
+    "markitdown": "file:../markitdown-ts",
+    "tesseract.js": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "markitdown-plugin": {
+    "interfaceVersion": 1
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

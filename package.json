@@ -6,15 +6,16 @@
   "workspaces": [
     "packages/markitdown-ts",
     "packages/markitdown-mcp-ts",
-    "packages/markitdown-sample-plugin-ts"
+    "packages/markitdown-sample-plugin-ts",
+    "packages/markitdown-ocr-ts"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
-    "test": "npm run test --workspace=packages/markitdown-ts",
+    "test": "npm run test --if-present --workspaces",
     "typecheck": "npm run typecheck --workspaces"
   },
   "devDependencies": {
-    "@types/node": "^26.5.0",
-    "typescript": "^7.0.2"
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
   }
 }
