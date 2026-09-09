@@ -15,14 +15,17 @@
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	"features": {
-		"ghcr.io/devcontainers-extra/features/hatch:2": {}
+		"ghcr.io/devcontainers-extra/features/hatch:2": {},
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "20"
+		}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
-	// Uncomment the next line to run commands after the container is created.
-	// "postCreateCommand": "cat /etc/os-release",
+	// Commands to run after container creation
+	"postCreateCommand": "npm install && npm run build",
 
 	// Configure tool-specific properties.
 	// "customizations": {},

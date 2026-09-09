@@ -1,0 +1,33 @@
+# syntax=docker/dockerfile:1
+FROM node:20-bookworm-slim AS builder
+
+WORKDIR /app
+
+# Install build dependencies
+COPY package*.json ./
+COPY packages/markitdown-ts/package*.json ./packages/markitdown-ts/
+COPY packages/markitdown-mcp-ts/package*.json ./packages/markitdown-mcp-ts/
+COPY packages/markitdown-ocr-ts/package*.json ./packages/markitdown-ocr-ts/
+COPY packages/markitdown-sample-plugin-ts/package*.json ./packages/markitdown-sample-plugin-ts/
+
+RUN npm ci
+
+# Copy full source and build
+COPY . .
+RUN npm run build
+
+# Runner stage
+FROM node:20-bookworm-slim AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy built packages from builder
+COPY --from=builder /app /app
+
+# Link markitdown globally
+RUN npm link ./packages/markitdown-ts
+
+ENTRYPOINT [ "markitdown" ]
+CMD [ "--help" ]
