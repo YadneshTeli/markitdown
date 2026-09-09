@@ -223,4 +223,26 @@ describe("MarkItDown General Test Vectors", () => {
       "This is the body of the test email message",
     );
   });
+
+  it("discovers installed plugins via MarkItDown.listPlugins()", () => {
+    const plugins = MarkItDown.listPlugins();
+    const samplePlugin = plugins.find((p) => p.name === "markitdown-sample-plugin");
+    expect(samplePlugin).toBeDefined();
+    expect(samplePlugin?.name).toBe("markitdown-sample-plugin");
+  });
+
+  it("loads and converts files using plugins when enablePlugins is true", async () => {
+    const mdWithPlugins = new MarkItDown({ enablePlugins: true });
+    const rtfContent =
+      "{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Arial;}}\\f0\\fs24 Hello \\b World!\\b0\\par This is a test RTF file.}";
+    const buffer = Buffer.from(rtfContent, "utf-8");
+
+    const result = await mdWithPlugins.convertStream(buffer, {
+      streamInfo: { extension: ".rtf", mimetype: "application/rtf" },
+    });
+
+    expect(result.markdown).toContain("Hello World!");
+    expect(result.markdown).toContain("This is a test RTF file.");
+  });
 });
+

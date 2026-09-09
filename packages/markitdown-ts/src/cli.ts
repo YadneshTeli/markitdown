@@ -30,6 +30,11 @@ async function main() {
       false,
     )
     .option(
+      "--list-plugins",
+      "List installed 3rd-party plugins. Plugins are loaded when using the -p or --use-plugins option.",
+      false,
+    )
+    .option(
       "--keep-data-uris",
       "Keep data URIs (like base64-encoded images) in the output.",
       false,
@@ -37,6 +42,28 @@ async function main() {
     .parse(process.argv);
 
   const opts = program.opts();
+
+  if (opts.listPlugins) {
+    console.log("Installed MarkItDown 3rd-party Plugins:\n");
+    const plugins = MarkItDown.listPlugins();
+    if (plugins.length === 0) {
+      console.log("  * No 3rd-party plugins installed.\n");
+      console.log(
+        "Find plugins by searching for the hashtag #markitdown-plugin on GitHub or npm.\n",
+      );
+    } else {
+      for (const p of plugins) {
+        console.log(
+          `  * ${p.name}${p.version ? ` (${p.version})` : ""}${p.description ? ` - ${p.description}` : ""}`,
+        );
+      }
+      console.log(
+        "\nUse the -p (or --use-plugins) option to enable 3rd-party plugins.\n",
+      );
+    }
+    process.exit(0);
+  }
+
   const filename = program.args[0];
 
   // Parse extension hint

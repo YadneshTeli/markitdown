@@ -43,6 +43,12 @@ import {
   BingSerpConverter,
   OutlookMsgConverter,
 } from "./converters/index.js";
+import {
+  discoverInstalledPlugins,
+  loadAndRegisterPlugins,
+  type MarkItDownPlugin,
+  type DiscoveredPlugin,
+} from "./plugins.js";
 
 /** Lower priority values are tried first */
 export const PRIORITY_SPECIFIC_FILE_FORMAT = 0.0;
@@ -74,6 +80,7 @@ export class MarkItDown {
   private converters: ConverterRegistration[] = [];
   private builtinsEnabled = false;
   private pluginsEnabled = false;
+  private pluginPromise?: Promise<void>;
   private llmClient?: unknown;
   private llmModel?: string;
   private llmPrompt?: string;
@@ -92,7 +99,7 @@ export class MarkItDown {
     }
 
     if (options.enablePlugins) {
-      this.enablePlugins();
+      this.pluginPromise = this.enablePlugins();
     }
   }
 
@@ -131,12 +138,39 @@ export class MarkItDown {
 
   /**
    * Enable plugin loading.
-   * Scans node_modules for packages with "markitdown-plugin" keyword.
+   * Scans node_modules for packages with "markitdown-plugin" keyword or configuration.
    */
-  enablePlugins(): void {
+  async enablePlugins(options?: Record<string, unknown>): Promise<void> {
     if (this.pluginsEnabled) return;
-    // Plugin discovery will be implemented in a future version
     this.pluginsEnabled = true;
+    await loadAndRegisterPlugins(this, {
+      llmClient: this.llmClient,
+      llmModel: this.llmModel,
+      llmPrompt: this.llmPrompt,
+      ...options,
+    });
+  }
+
+  /**
+   * Explicitly register a 3rd-party plugin.
+   */
+  async registerPlugin(
+    plugin: MarkItDownPlugin,
+    options?: Record<string, unknown>,
+  ): Promise<void> {
+    await plugin.registerConverters(this, {
+      llmClient: this.llmClient,
+      llmModel: this.llmModel,
+      llmPrompt: this.llmPrompt,
+      ...options,
+    });
+  }
+
+  /**
+   * List installed 3rd-party plugins found in environment/node_modules.
+   */
+  static listPlugins(startDir?: string): DiscoveredPlugin[] {
+    return discoverInstalledPlugins(startDir);
   }
 
   /**
@@ -312,6 +346,10 @@ export class MarkItDown {
     streamInfoGuesses: StreamInfo[],
     options?: ConvertOptions,
   ): Promise<DocumentConverterResult> {
+    if (this.pluginPromise) {
+      await this.pluginPromise;
+    }
+
     const failedAttempts: FailedConversionAttempt[] = [];
 
     // Sort converters by priority (stable sort)

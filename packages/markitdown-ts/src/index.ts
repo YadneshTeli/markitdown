@@ -43,4 +43,14 @@ export {
   RssConverter,
   IpynbConverter,
   BingSerpConverter,
+  OutlookMsgConverter,
 } from "./converters/index.js";
+
+// Plugin system
+export {
+  discoverInstalledPlugins,
+  loadPlugin,
+  loadAndRegisterPlugins,
+} from "./plugins.js";
+export type { MarkItDownPlugin, DiscoveredPlugin } from "./plugins.js";
+
