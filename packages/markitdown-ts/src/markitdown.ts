@@ -41,6 +41,7 @@ import {
   RssConverter,
   IpynbConverter,
   BingSerpConverter,
+  OutlookMsgConverter,
 } from "./converters/index.js";
 
 /** Lower priority values are tried first */
@@ -123,6 +124,7 @@ export class MarkItDown {
     this.registerConverter(new PdfConverter());
     this.registerConverter(new EpubConverter());
     this.registerConverter(new CsvConverter());
+    this.registerConverter(new OutlookMsgConverter());
 
     this.builtinsEnabled = true;
   }

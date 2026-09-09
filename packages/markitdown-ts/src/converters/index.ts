@@ -18,4 +18,5 @@ export { WikipediaConverter } from "./wikipedia.js";
 export { RssConverter } from "./rss.js";
 export { IpynbConverter } from "./ipynb.js";
 export { BingSerpConverter } from "./bing-serp.js";
+export { OutlookMsgConverter } from "./outlook-msg.js";
 export { createMarkdownConverter } from "./markdownify.js";

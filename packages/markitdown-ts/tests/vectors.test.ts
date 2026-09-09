@@ -209,4 +209,18 @@ describe("MarkItDown General Test Vectors", () => {
     );
     expect(mp3Result.markdown).toContain("Artist: Artist Name Test String");
   });
+
+  it("converts Outlook .msg files correctly", async () => {
+    const file = path.join(TEST_FILES_DIR, "test_outlook_msg.msg");
+    const result = await markitdown.convert(file);
+
+    expect(result.markdown).toContain("# Email Message");
+    expect(result.markdown).toContain("**From:** test.sender@example.com");
+    expect(result.markdown).toContain("**To:** test.recipient@example.com");
+    expect(result.markdown).toContain("**Subject:** Test Email Message");
+    expect(result.markdown).toContain("## Content");
+    expect(result.markdown).toContain(
+      "This is the body of the test email message",
+    );
+  });
 });

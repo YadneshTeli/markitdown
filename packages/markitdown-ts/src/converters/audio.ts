@@ -38,8 +38,8 @@ export class AudioConverter extends DocumentConverter {
 
   async convert(
     fileStream: Buffer,
-    _streamInfo: StreamInfo,
-    _options?: ConvertOptions,
+    streamInfo: StreamInfo,
+    options?: ConvertOptions,
   ): Promise<DocumentConverterResult> {
     let mdContent = "";
 
@@ -74,8 +74,18 @@ export class AudioConverter extends DocumentConverter {
       // music-metadata not available or parsing failed
     }
 
-    // Note: Audio transcription (SpeechRecognition) is not available in Node.js
-    // without external services. This can be added via a plugin using a cloud API.
+    // Optional: Audio speech-to-text transcription
+    const transcriber = (options as any)?.transcribeAudio || (options as any)?.audioTranscriber;
+    if (typeof transcriber === "function") {
+      try {
+        const transcript = await transcriber(fileStream, streamInfo.extension || ".wav");
+        if (transcript && typeof transcript === "string" && transcript.trim()) {
+          mdContent += "\n## Transcript\n\n" + transcript.trim() + "\n";
+        }
+      } catch {
+        // Transcription failed; continue without it
+      }
+    }
 
     return new DocumentConverterResult({ markdown: mdContent.trim() });
   }

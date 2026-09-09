@@ -9,6 +9,7 @@ import {
   type ConvertOptions,
 } from "../base-converter.js";
 import type { StreamInfo } from "../stream-info.js";
+import { llmCaption } from "../llm-caption.js";
 
 const ACCEPTED_MIME_TYPE_PREFIXES = ["image/jpeg", "image/png"];
 const ACCEPTED_FILE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
@@ -91,16 +92,13 @@ export class ImageConverter extends DocumentConverter {
 
     // LLM description
     const llmClient = options?.llmClient;
-    const llmModel = options?.llmModel;
-    if (llmClient && llmModel) {
+    if (llmClient) {
       try {
-        const description = await this.getLlmDescription(
-          fileStream,
-          streamInfo,
-          llmClient,
-          llmModel as string,
-          options?.llmPrompt as string | undefined,
-        );
+        const description = await llmCaption(fileStream, streamInfo, {
+          client: llmClient,
+          model: options?.llmModel,
+          prompt: options?.llmPrompt,
+        });
         if (description) {
           mdContent += "\n# Description:\n" + description.trim() + "\n";
         }
@@ -110,39 +108,5 @@ export class ImageConverter extends DocumentConverter {
     }
 
     return new DocumentConverterResult({ markdown: mdContent });
-  }
-
-  private async getLlmDescription(
-    fileStream: Buffer,
-    streamInfo: StreamInfo,
-    client: any,
-    model: string,
-    prompt?: string,
-  ): Promise<string | null> {
-    if (!prompt?.trim()) {
-      prompt = "Write a detailed caption for this image.";
-    }
-
-    const contentType = streamInfo.mimetype || "application/octet-stream";
-    const base64Image = fileStream.toString("base64");
-    const dataUri = `data:${contentType};base64,${base64Image}`;
-
-    try {
-      const response = await client.chat.completions.create({
-        model,
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: dataUri } },
-            ],
-          },
-        ],
-      });
-      return response.choices[0]?.message?.content || null;
-    } catch {
-      return null;
-    }
   }
 }
